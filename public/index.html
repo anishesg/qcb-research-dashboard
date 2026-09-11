@@ -9,20 +9,20 @@
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
   :root {
-    --bg: #08080c;
-    --surface: #0f0f15;
-    --border: rgba(255,255,255,0.06);
-    --border-hover: rgba(255,255,255,0.12);
-    --text: #f0f0f0;
-    --muted: #555;
-    --subtle: #333;
-    --green: #a8e6b4;
-    --blue: #a8c8f0;
-    --purple: #c8a8f0;
-    --pink: #f0a8c8;
-    --yellow: #f0e0a8;
-    --red: #f0a8a8;
-    --white: #ffffff;
+    --bg: #ffffff;
+    --surface: #f7f7f9;
+    --border: rgba(0,0,0,0.07);
+    --border-hover: rgba(0,0,0,0.14);
+    --text: #111111;
+    --muted: #888;
+    --subtle: #ddd;
+    --green: #2d9e5f;
+    --blue: #3478c8;
+    --purple: #7c4fd4;
+    --pink: #d44f8a;
+    --yellow: #b87a00;
+    --red: #d44f4f;
+    --white: #111111;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; }
@@ -47,7 +47,7 @@
     gap: 20px;
     position: sticky;
     top: 0;
-    background: var(--bg);
+    background: rgba(255,255,255,0.92);
     z-index: 100;
     backdrop-filter: blur(20px);
   }
@@ -100,10 +100,10 @@
     text-transform: uppercase;
     letter-spacing: 0.06em;
   }
-  .pill-running { background: rgba(168,230,180,0.12); color: var(--green); }
-  .pill-paused  { background: rgba(240,224,168,0.12); color: var(--yellow); }
-  .pill-done    { background: rgba(168,200,240,0.12); color: var(--blue); }
-  .pill-offline { background: rgba(255,255,255,0.05); color: var(--muted); }
+  .pill-running { background: rgba(45,158,95,0.1); color: var(--green); }
+  .pill-paused  { background: rgba(184,122,0,0.1); color: var(--yellow); }
+  .pill-done    { background: rgba(52,120,200,0.1); color: var(--blue); }
+  .pill-offline { background: rgba(0,0,0,0.05); color: var(--muted); }
 
   /* CARDS */
   .card {
@@ -195,7 +195,7 @@
 
   /* LOG */
   .log-stream {
-    background: var(--bg);
+    background: #f4f4f6;
     border: 1px solid var(--border);
     border-radius: 8px;
     padding: 12px 14px;
@@ -206,7 +206,7 @@
     overflow-y: auto;
     line-height: 1.7;
   }
-  .log-stream .log-hi { color: rgba(168,230,180,0.8); }
+  .log-stream .log-hi { color: var(--green); }
 
   /* EMPTY */
   .empty { color: var(--subtle); font-size: 11px; padding: 20px 0; text-align: center; }
@@ -364,8 +364,8 @@
 
 <script>
 // ── Chart defaults ──────────────────────────────────────────────
-Chart.defaults.color = '#444';
-Chart.defaults.borderColor = 'rgba(255,255,255,0.05)';
+Chart.defaults.color = '#888';
+Chart.defaults.borderColor = 'rgba(0,0,0,0.06)';
 Chart.defaults.font.family = 'Inter, sans-serif';
 Chart.defaults.font.size = 11;
 
@@ -378,7 +378,7 @@ const PASTEL = {
   red:    'rgba(240,168,168,0.9)',
 };
 const PASTEL_DIM = Object.fromEntries(
-  Object.entries(PASTEL).map(([k,v]) => [k, v.replace('0.9','0.18')])
+  Object.entries(PASTEL).map(([k,v]) => [k, v.replace('0.9','0.12')])
 );
 
 function chartDefaults(extra={}) {
@@ -387,8 +387,8 @@ function chartDefaults(extra={}) {
     maintainAspectRatio: true,
     plugins: { legend: { display: false }, tooltip: { backgroundColor:'#111', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10, titleFont:{size:11}, bodyFont:{size:11} } },
     scales: {
-      x: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ color:'#444', font:{size:10} } },
-      y: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ color:'#444', font:{size:10} } }
+      x: { grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ color:'#444', font:{size:10} } },
+      y: { grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ color:'#444', font:{size:10} } }
     },
     ...extra
   };
@@ -425,13 +425,13 @@ function updateFlashCharts(results) {
   makeChart('fe-bar-chart', 'bar', {
     labels,
     datasets: [{ data: scores, backgroundColor: colors, borderRadius: 4, borderSkipped: false }]
-  }, chartDefaults({ scales:{ x:{ grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#444',font:{size:9},maxRotation:45}}, y:{ min: Math.min(...scores.filter(Boolean))*0.97, grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#444',font:{size:10}} } } }));
+  }, chartDefaults({ scales:{ x:{ grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#444',font:{size:9},maxRotation:45}}, y:{ min: Math.min(...scores.filter(Boolean))*0.97, grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#444',font:{size:10}} } } }));
 
   if (mems.some(Boolean)) {
     makeChart('fe-mem-chart', 'bar', {
       labels,
       datasets: [{ data: mems, backgroundColor: PASTEL_DIM.blue, borderColor: PASTEL.blue, borderWidth:1, borderRadius:4, borderSkipped:false }]
-    }, chartDefaults({ scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#444',font:{size:9},maxRotation:45}}, y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#444',font:{size:10}}} } }));
+    }, chartDefaults({ scales:{ x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#444',font:{size:9},maxRotation:45}}, y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#444',font:{size:10}}} } }));
   }
 }
 
@@ -472,8 +472,8 @@ function updateDCSCharts() {
       tooltip: { backgroundColor:'#111', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10 }
     },
     scales: {
-      x: { type:'linear', title:{display:true,text:'Step',color:'#444',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#444',font:{size:10}} },
-      y: { title:{display:true,text:'Validity Gap',color:'#444',font:{size:10}}, grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#444',font:{size:10}} }
+      x: { type:'linear', title:{display:true,text:'Step',color:'#444',font:{size:10}}, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#444',font:{size:10}} },
+      y: { title:{display:true,text:'Validity Gap',color:'#444',font:{size:10}}, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#444',font:{size:10}} }
     }
   });
 }
