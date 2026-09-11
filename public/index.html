@@ -6,472 +6,385 @@
 <title>ICLR Research</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-  :root {
-    --bg: #ffffff;
-    --surface: #f8f8fa;
-    --border: rgba(0,0,0,0.07);
-    --border-h: rgba(0,0,0,0.13);
-    --text: #0a0a0a;
-    --muted: #8a8a8a;
-    --subtle: #e5e5e5;
-    --green: #16a34a;
-    --blue: #2563eb;
-    --purple: #7c3aed;
-    --yellow: #b45309;
-    --red: #dc2626;
-    --pink: #db2777;
-  }
-
-  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    font-size: 13px;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
-  }
-
-  /* NAV */
-  nav {
-    height: 50px;
-    display: flex;
-    align-items: center;
-    padding: 0 28px;
-    gap: 16px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: rgba(255,255,255,0.88);
-    backdrop-filter: saturate(180%) blur(20px);
-    z-index: 100;
-  }
-  .logo { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--text); }
-  .nav-divider { width: 1px; height: 14px; background: var(--border); }
-  .nav-sub { font-size: 12px; color: var(--muted); }
-  .live-badge {
-    margin-left: auto;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 11px;
-    color: var(--muted);
-  }
-  .dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--green);
-    animation: blink 2s infinite;
-  }
-  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
-
-  /* LAYOUT */
-  .page { max-width: 1300px; margin: 0 auto; padding: 28px 28px 60px; }
-
-  /* SECTION */
-  .exp-section { margin-bottom: 40px; }
-  .exp-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 18px;
-    padding-bottom: 14px;
-    border-bottom: 1px solid var(--border);
-  }
-  .exp-num { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
-  .exp-name { font-size: 14px; font-weight: 600; color: var(--text); }
-  .exp-tag { font-size: 10px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px; font-weight: 500; }
-
-  /* STATUS PILLS */
-  .pill { font-size: 9.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.07em; }
-  .pill-run  { background: #dcfce7; color: #15803d; }
-  .pill-done { background: #dbeafe; color: #1d4ed8; }
-  .pill-wait { background: #fef9c3; color: #854d0e; }
-  .pill-off  { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
-
-  /* STAT ROW */
-  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
-  .stat {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    transition: border-color 0.15s;
-  }
-  .stat:hover { border-color: var(--border-h); }
-  .stat-l { font-size: 9.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 5px; }
-  .stat-v { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; line-height: 1; }
-  .stat-s { font-size: 11px; color: var(--muted); margin-top: 4px; }
-  .c-g { color: var(--green); }
-  .c-b { color: var(--blue); }
-  .c-p { color: var(--purple); }
-  .c-y { color: var(--yellow); }
-
-  /* PROGRESS */
-  .prog-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
-  .prog-row span { font-size: 10px; color: var(--muted); }
-  .prog-track { height: 3px; background: var(--subtle); border-radius: 2px; overflow: hidden; }
-  .prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--blue), var(--purple)); transition: width 0.8s ease; }
-
-  /* CHARTS GRID */
-  .charts-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-  .charts-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-  .chart-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 18px;
-  }
-  .chart-card:hover { border-color: var(--border-h); }
-  .chart-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 12px; }
-  canvas { max-height: 185px; }
-  .chart-tall canvas { max-height: 230px; }
-
-  /* TABLE CARD */
-  .table-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 16px 18px;
-  }
-  table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; font-size: 9.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; padding: 0 0 9px; border-bottom: 1px solid var(--border); }
-  td { padding: 8px 0; font-size: 12px; color: var(--text); border-bottom: 1px solid var(--border); }
-  tr:last-child td { border-bottom: none; }
-  .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; color: var(--blue); }
-  .pos { color: var(--green); font-weight: 600; }
-  .neg { color: var(--red); }
-  .neu { color: var(--muted); }
-
-  /* LOG */
-  .log-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 14px 16px;
-    margin-top: 12px;
-  }
-  .log-inner {
-    background: #fff;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 10px 12px;
-    font-family: 'SF Mono', 'Fira Code', monospace;
-    font-size: 10.5px;
-    color: var(--muted);
-    max-height: 90px;
-    overflow-y: auto;
-    line-height: 1.7;
-    margin-top: 10px;
-  }
-  .log-inner .hi { color: var(--green); }
-
-  /* EMPTY */
-  .empty-state { text-align: center; padding: 24px 0; color: var(--subtle); font-size: 12px; }
-
-  /* SEP */
-  .sep { height: 1px; background: var(--border); margin: 8px 0 28px; }
-
-  @media(max-width:900px) {
-    .stats { grid-template-columns: 1fr 1fr; }
-    .charts-3, .charts-2 { grid-template-columns: 1fr; }
-  }
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+:root{--bg:#fff;--s:#f7f7f9;--b:rgba(0,0,0,.07);--bh:rgba(0,0,0,.13);--t:#0a0a0a;--m:#999;--sub:#e5e5e5;--g:#16a34a;--bl:#2563eb;--p:#7c3aed;--y:#b45309;--r:#dc2626;--pi:#db2777}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--t);font-family:'Inter',-apple-system,sans-serif;font-size:13px;line-height:1.5;-webkit-font-smoothing:antialiased}
+nav{height:50px;display:flex;align-items:center;padding:0 28px;gap:14px;border-bottom:1px solid var(--b);position:sticky;top:0;background:rgba(255,255,255,.9);backdrop-filter:blur(20px);z-index:100}
+.logo{font-size:11px;font-weight:700;letter-spacing:.14em;color:var(--t)}
+.ndiv{width:1px;height:13px;background:var(--b)}
+.nsub{font-size:12px;color:var(--m)}
+.nlive{margin-left:auto;display:flex;align-items:center;gap:7px;font-size:11px;color:var(--m)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--g);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.25}}
+.page{max-width:1380px;margin:0 auto;padding:26px 28px 60px}
+.xsec{margin-bottom:44px}
+.xh{display:flex;align-items:center;gap:9px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--b)}
+.xnum{font-size:10px;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:.12em}
+.xname{font-size:14px;font-weight:600;color:var(--t)}
+.xtag{font-size:10px;color:var(--m);background:var(--s);border:1px solid var(--b);padding:2px 9px;border-radius:20px;font-weight:500}
+.pill{font-size:9px;font-weight:700;padding:3px 9px;border-radius:20px;text-transform:uppercase;letter-spacing:.07em}
+.pr{background:#dcfce7;color:#15803d}.pd{background:#dbeafe;color:#1d4ed8}.pw{background:#fef9c3;color:#854d0e}.po{background:var(--s);color:var(--m);border:1px solid var(--b)}
+.stats{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;margin-bottom:12px}
+.stat{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:13px 15px;transition:border-color .15s,box-shadow .15s;cursor:default}
+.stat:hover{border-color:var(--bh);box-shadow:0 2px 8px rgba(0,0,0,.05)}
+.sl{font-size:9px;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:.1em;margin-bottom:5px}
+.sv{font-size:22px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.ss{font-size:10px;color:var(--m);margin-top:3px}
+.cg{color:var(--g)}.cb{color:var(--bl)}.cp{color:var(--p)}.cy{color:var(--y)}.cr{color:var(--r)}.cpi{color:var(--pi)}
+.pgrow{display:flex;justify-content:space-between;margin-bottom:4px}
+.pgrow span{font-size:10px;color:var(--m)}
+.pgtrk{height:3px;background:var(--sub);border-radius:2px;overflow:hidden}
+.pgfil{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--bl),var(--p));transition:width 1s ease}
+/* gauge */
+.gauge-wrap{position:relative;width:60px;height:34px;overflow:hidden;margin-top:2px}
+.gauge-bg{width:60px;height:60px;border-radius:50%;border:5px solid var(--sub);position:absolute;top:0;clip-path:inset(0 0 50% 0)}
+.gauge-fill{width:60px;height:60px;border-radius:50%;border:5px solid var(--g);position:absolute;top:0;clip-path:inset(0 0 50% 0);transform-origin:50% 100%;transition:transform .8s ease}
+/* grid */
+.g3{display:grid;grid-template-columns:2fr 1fr 1fr;gap:11px;margin-bottom:11px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.g22{display:grid;grid-template-columns:2fr 1fr;gap:11px;margin-bottom:11px}
+.card{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:15px 17px;transition:border-color .15s}
+.card:hover{border-color:var(--bh)}
+.cl{font-size:9.5px;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:.1em;margin-bottom:11px}
+canvas{max-height:180px}
+.cht{max-height:235px}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:9px;font-weight:600;color:var(--m);text-transform:uppercase;letter-spacing:.1em;padding:0 0 8px;border-bottom:1px solid var(--b)}
+td{padding:7px 0;font-size:12px;color:var(--t);border-bottom:1px solid var(--b)}
+tr:last-child td{border-bottom:none}
+.mono{font-family:'SF Mono','Fira Code',monospace;font-size:10.5px;color:var(--bl)}
+.pos{color:var(--g);font-weight:600}.neg{color:var(--r)}.neu{color:var(--m)}
+.logcard{background:var(--s);border:1px solid var(--b);border-radius:10px;padding:13px 16px;margin-top:10px}
+.loginner{background:#fff;border:1px solid var(--b);border-radius:6px;padding:9px 11px;font-family:'SF Mono','Fira Code',monospace;font-size:10px;color:var(--m);max-height:80px;overflow-y:auto;line-height:1.8;margin-top:8px}
+.loginner .hi{color:var(--g)}
+.empty{text-align:center;padding:22px 0;color:var(--sub);font-size:12px}
+.sep{height:1px;background:var(--b);margin:6px 0 26px}
+/* sparkline numbers */
+.snum{font-size:11px;color:var(--m);margin-top:4px}
+/* animated ring */
+.ring-wrap{display:flex;align-items:center;gap:12px;margin-top:6px}
+.ring{position:relative;width:44px;height:44px}
+.ring svg{transform:rotate(-90deg)}
+.ring-track{fill:none;stroke:var(--sub);stroke-width:4}
+.ring-fill{fill:none;stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset .9s ease,stroke .3s}
+.ring-val{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:9.5px;font-weight:700;color:var(--t)}
+@media(max-width:1100px){.stats{grid-template-columns:repeat(3,1fr)}.g3{grid-template-columns:1fr}.g2,.g22{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
-
 <nav>
   <span class="logo">ICLR</span>
-  <span class="nav-divider"></span>
-  <span class="nav-sub">Research Dashboard</span>
-  <div class="live-badge">
-    <div class="dot"></div>
-    <span id="nav-time">Live</span>
-  </div>
+  <span class="ndiv"></span>
+  <span class="nsub">Research Dashboard</span>
+  <div class="nlive"><div class="dot"></div><span id="nt">Live</span></div>
 </nav>
-
 <div class="page">
 
-  <!-- ── FLASH-EVICT ── -->
-  <div class="exp-section">
-    <div class="exp-header">
-      <span class="exp-num">01</span>
-      <span class="exp-name">Flash-Evict · Fused Prefill KV Cache Eviction</span>
-      <span class="exp-tag">Blackwell 96 GB</span>
-      <span class="pill pill-run" id="fe-pill">Running</span>
-    </div>
+<!-- ══ 01 FLASH-EVICT ══ -->
+<div class="xsec">
+  <div class="xh">
+    <span class="xnum">01</span>
+    <span class="xname">Flash-Evict · Fused Prefill KV Cache Eviction</span>
+    <span class="xtag">Blackwell 96 GB</span>
+    <span class="pill pr" id="fe-pill">Running</span>
+  </div>
 
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-l">GPU Memory</div>
-        <div class="stat-v c-g" id="fe-gpu">—</div>
-        <div class="stat-s">NVIDIA RTX PRO 6000</div>
-      </div>
-      <div class="stat">
-        <div class="stat-l">Progress</div>
-        <div class="stat-v c-b"><span id="fe-pct">0</span><span style="font-size:14px;font-weight:400;color:var(--muted)"> %</span></div>
-        <div style="margin-top:8px">
-          <div class="prog-row"><span id="fe-preds">0</span><span id="fe-tasks">0/21 tasks</span></div>
-          <div class="prog-track"><div class="prog-fill" id="fe-bar" style="width:0%"></div></div>
-        </div>
-      </div>
-      <div class="stat">
-        <div class="stat-l">Model</div>
-        <div class="stat-v" style="font-size:15px;padding-top:4px">Qwen2.5-7B</div>
-        <div class="stat-s">+ Llama-3.1-8B queued</div>
-      </div>
-      <div class="stat">
-        <div class="stat-l">ETA</div>
-        <div class="stat-v c-p" id="fe-eta">—</div>
-        <div class="stat-s">LongBench · 21 tasks</div>
-      </div>
+  <!-- GPU STATS ROW -->
+  <div class="stats" id="fe-stats">
+    <div class="stat">
+      <div class="sl">GPU Util</div>
+      <div class="sv cg" id="fe-util">—<span style="font-size:14px;font-weight:400;color:var(--m)">%</span></div>
+      <div class="ss" id="fe-util-s">compute</div>
     </div>
-
-    <div class="charts-3">
-      <div class="chart-card chart-tall">
-        <div class="chart-label">Score by Method</div>
-        <canvas id="fe-score-chart"></canvas>
-        <div class="empty-state" id="fe-score-empty">Waiting for results…</div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-label">Memory @ 131K (MiB)</div>
-        <canvas id="fe-mem-chart"></canvas>
-        <div class="empty-state" id="fe-mem-empty">—</div>
-      </div>
-      <div class="table-card">
-        <div class="chart-label" style="margin-bottom:10px">vs SnapKV Baseline</div>
-        <table>
-          <thead><tr><th>Method</th><th>Score</th><th>Delta</th></tr></thead>
-          <tbody id="fe-table"><tr><td colspan="3" class="empty-state">—</td></tr></tbody>
-        </table>
-      </div>
+    <div class="stat">
+      <div class="sl">VRAM</div>
+      <div class="sv cb"><span id="fe-mem-used">—</span><span style="font-size:13px;font-weight:400;color:var(--m)">GB</span></div>
+      <div class="ss"><span id="fe-mem-pct">—</span>% of 96 GB</div>
     </div>
-
-    <div class="log-card">
-      <div class="chart-label">Live Output</div>
-      <div class="log-inner" id="fe-log">Connecting…</div>
+    <div class="stat">
+      <div class="sl">Temp</div>
+      <div class="sv cy" id="fe-temp">—<span style="font-size:13px;font-weight:400;color:var(--m)">°C</span></div>
+      <div class="ss" id="fe-temp-s">thermal</div>
+    </div>
+    <div class="stat">
+      <div class="sl">Power</div>
+      <div class="sv cp" id="fe-power">—<span style="font-size:13px;font-weight:400;color:var(--m)">W</span></div>
+      <div class="ss"><span id="fe-power-pct">—</span>% TDP</div>
+    </div>
+    <div class="stat">
+      <div class="sl">Tok/sec</div>
+      <div class="sv cpi" id="fe-tps">—</div>
+      <div class="ss" id="fe-rate">—/min preds</div>
+    </div>
+    <div class="stat">
+      <div class="sl">Progress</div>
+      <div class="sv"><span id="fe-pct">0</span><span style="font-size:14px;font-weight:400;color:var(--m)">%</span></div>
+      <div style="margin-top:7px">
+        <div class="pgrow"><span id="fe-preds">—</span><span id="fe-eta">—</span></div>
+        <div class="pgtrk"><div class="pgfil" id="fe-bar" style="width:0%"></div></div>
+      </div>
     </div>
   </div>
 
-  <div class="sep"></div>
-
-  <!-- ── DCS ── -->
-  <div class="exp-section">
-    <div class="exp-header">
-      <span class="exp-num">02</span>
-      <span class="exp-name">DCS · Diverse Correct Solutions RL Training</span>
-      <span class="exp-tag">Oregon A10G</span>
-      <span class="pill pill-run" id="dcs-pill">Running</span>
+  <!-- CHARTS -->
+  <div class="g3">
+    <div class="card cht">
+      <div class="cl">Score by Method</div>
+      <canvas id="fe-score"></canvas>
+      <div class="empty" id="fe-se">Waiting for results…</div>
     </div>
-
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-l">GPU Memory</div>
-        <div class="stat-v c-g" id="dcs-gpu">—</div>
-        <div class="stat-s">NVIDIA A10G 24 GB</div>
-      </div>
-      <div class="stat">
-        <div class="stat-l">Step / Arm</div>
-        <div class="stat-v c-b" id="dcs-step">—</div>
-        <div class="stat-s" id="dcs-arm">—</div>
-      </div>
-      <div class="stat">
-        <div class="stat-l">Validity Gap ↓</div>
-        <div class="stat-v c-y" id="dcs-vgap">—</div>
-        <div class="stat-s">pass@8 − cot@8</div>
-      </div>
-      <div class="stat">
-        <div class="stat-l">Pass@8 / Pass@1</div>
-        <div class="stat-v" id="dcs-p8">—</div>
-        <div class="stat-s" id="dcs-p1">Pass@1: —</div>
-      </div>
+    <div class="card">
+      <div class="cl">GPU Utilization History</div>
+      <canvas id="fe-gpu-hist"></canvas>
+      <div class="empty" id="fe-ghe">Loading…</div>
     </div>
-
-    <div class="charts-2">
-      <div class="chart-card">
-        <div class="chart-label">Validity Gap over Training Steps</div>
-        <canvas id="dcs-vgap-chart"></canvas>
-        <div class="empty-state" id="dcs-vgap-empty">Training in progress…</div>
-      </div>
-      <div class="chart-card">
-        <div class="chart-label">Pass@8 vs CoT@8 — Final Results</div>
-        <canvas id="dcs-compare-chart"></canvas>
-        <div class="empty-state" id="dcs-compare-empty">Awaiting final arms…</div>
-      </div>
-    </div>
-
-    <div class="table-card">
-      <div class="chart-label" style="margin-bottom:10px">Arm Comparison</div>
-      <table>
-        <thead><tr><th>Method</th><th>Pass@1</th><th>Pass@8</th><th>CoT@8</th><th>vGap</th><th>Signal</th></tr></thead>
-        <tbody id="dcs-table"><tr><td colspan="6" class="empty-state">Waiting for results…</td></tr></tbody>
-      </table>
+    <div class="card">
+      <div class="cl">Throughput (tok/s)</div>
+      <canvas id="fe-tps-hist"></canvas>
+      <div class="empty" id="fe-the">Loading…</div>
     </div>
   </div>
-
+  <div class="g22">
+    <div class="card">
+      <div class="cl">Memory @ 131K ctx (MiB)</div>
+      <canvas id="fe-mem"></canvas>
+      <div class="empty" id="fe-me">—</div>
+    </div>
+    <div class="card">
+      <div class="cl">vs SnapKV-256 Baseline</div>
+      <table><thead><tr><th>Method</th><th>Score</th><th>Δ</th><th>Mem</th></tr></thead>
+      <tbody id="fe-tbl"><tr><td colspan="4" class="empty">—</td></tr></tbody></table>
+    </div>
+  </div>
+  <div class="logcard"><div class="cl">Live Output</div><div class="loginner" id="fe-log">Connecting…</div></div>
 </div>
 
+<div class="sep"></div>
+
+<!-- ══ 02 DCS ══ -->
+<div class="xsec">
+  <div class="xh">
+    <span class="xnum">02</span>
+    <span class="xname">DCS · Diverse Correct Solutions RL Training</span>
+    <span class="xtag">Oregon A10G 24 GB</span>
+    <span class="pill pr" id="dcs-pill">Running</span>
+  </div>
+
+  <div class="stats" style="grid-template-columns:repeat(5,1fr)">
+    <div class="stat">
+      <div class="sl">GPU Util</div>
+      <div class="sv cg" id="dcs-util">—<span style="font-size:14px;font-weight:400;color:var(--m)">%</span></div>
+      <div class="ss">A10G Oregon</div>
+    </div>
+    <div class="stat">
+      <div class="sl">VRAM</div>
+      <div class="sv cb" id="dcs-mem">—<span style="font-size:13px;font-weight:400;color:var(--m)">GB</span></div>
+      <div class="ss">of 24 GB</div>
+    </div>
+    <div class="stat">
+      <div class="sl">Step / Arm</div>
+      <div class="sv cp" id="dcs-step">—</div>
+      <div class="ss" id="dcs-arm">—</div>
+    </div>
+    <div class="stat">
+      <div class="sl">Validity Gap ↓</div>
+      <div class="sv cy" id="dcs-vgap">—</div>
+      <div class="ss">pass@8 − cot@8</div>
+    </div>
+    <div class="stat">
+      <div class="sl">Pass@8 / @1</div>
+      <div class="sv" id="dcs-p8">—</div>
+      <div class="ss" id="dcs-p1">Pass@1: —</div>
+    </div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="cl">Validity Gap over Training Steps</div>
+      <canvas id="dcs-vgap-c"></canvas>
+      <div class="empty" id="dcs-ve">Training in progress…</div>
+    </div>
+    <div class="card">
+      <div class="cl">Pass@8 vs CoT@8 — Final</div>
+      <canvas id="dcs-compare"></canvas>
+      <div class="empty" id="dcs-ce">Awaiting arms…</div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="cl" style="margin-bottom:10px">Arm Comparison</div>
+    <table><thead><tr><th>Method</th><th>Pass@1</th><th>Pass@8</th><th>CoT@8</th><th>vGap</th><th>Signal</th></tr></thead>
+    <tbody id="dcs-tbl"><tr><td colspan="6" class="empty">Waiting for results…</td></tr></tbody></table>
+  </div>
+</div>
+
+</div><!-- /page -->
+
 <script>
-// ── Chart config ────────────────────────────────────────────────
-Chart.defaults.font.family = 'Inter, sans-serif';
-Chart.defaults.font.size = 10.5;
-Chart.defaults.color = '#aaa';
-Chart.defaults.borderColor = 'rgba(0,0,0,0.06)';
+Chart.defaults.font.family="Inter,sans-serif";
+Chart.defaults.font.size=10.5;
+Chart.defaults.color="#bbb";
+Chart.defaults.borderColor="rgba(0,0,0,0.055)";
 
-const P = { g:'#16a34a', b:'#2563eb', p:'#7c3aed', y:'#b45309', r:'#dc2626', k:'#db2777' };
-const L = { g:'rgba(22,163,74,0.1)', b:'rgba(37,99,235,0.1)', p:'rgba(124,58,237,0.1)', y:'rgba(180,83,9,0.1)', r:'rgba(220,38,38,0.1)' };
+const C={g:"#16a34a",b:"#2563eb",p:"#7c3aed",y:"#b45309",r:"#dc2626",pi:"#db2777"};
+const CL={g:"rgba(22,163,74,.12)",b:"rgba(37,99,235,.12)",p:"rgba(124,58,237,.12)",y:"rgba(180,83,9,.12)",r:"rgba(220,38,38,.12)"};
 
-const baseOpts = (extra={}) => ({
-  responsive: true, maintainAspectRatio: true,
-  plugins: {
-    legend: { display: false },
-    tooltip: { backgroundColor:'#fff', borderColor:'rgba(0,0,0,0.1)', borderWidth:1, titleColor:'#111', bodyColor:'#555', padding:10, cornerRadius:8 }
-  },
-  scales: {
-    x: { grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ color:'#bbb' } },
-    y: { grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ color:'#bbb' } }
-  },
-  ...extra
+const ch={};
+function mkCh(id,type,data,opts){const e=document.getElementById(id);if(!e)return;if(ch[id])ch[id].destroy();ch[id]=new Chart(e,{type,data,options:opts})}
+
+const baseOpts=(ex={})=>({
+  responsive:true,maintainAspectRatio:true,animation:{duration:600},
+  plugins:{legend:{display:false},tooltip:{backgroundColor:"#fff",borderColor:"rgba(0,0,0,.1)",borderWidth:1,titleColor:"#111",bodyColor:"#555",padding:10,cornerRadius:8,boxShadow:"0 4px 12px rgba(0,0,0,.08)"}},
+  scales:{x:{grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc"}},y:{grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc"}}},
+  ...ex
 });
 
-let ch = {};
-function mkChart(id, type, data, opts) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  if (ch[id]) ch[id].destroy();
-  ch[id] = new Chart(el, { type, data, options: opts });
-}
+// History for sparklines
+const feGpuHist=[],feTpsHist=[];
+const dcsHist={};
 
-// ── DCS history ─────────────────────────────────────────────────
-const dcsHist = {};
+function se(id,v){const e=document.getElementById(id);if(e&&v!=null)e.textContent=v}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
 
-// ── Updaters ────────────────────────────────────────────────────
-function setEl(id, v) { const e=document.getElementById(id); if(e&&v!=null) e.textContent=v; }
+function updateFE(d){
+  const st=d.status||"OFFLINE";
+  const p=document.getElementById("fe-pill");
+  p.textContent=st;p.className="pill "+(st==="RUNNING"||st==="Running"?"pr":st==="DONE"?"pd":st==="PAUSED"?"pw":"po");
 
-function updateFE(d) {
-  const s = d.status||'OFFLINE';
-  const p = document.getElementById('fe-pill');
-  p.textContent = s;
-  p.className = 'pill ' + (s==='RUNNING'||s==='Running'?'pill-run':s==='DONE'?'pill-done':s==='PAUSED'?'pill-wait':'pill-off');
+  const g=d.gpu||{};
+  // GPU stats
+  se("fe-util",g.util_gpu!==undefined?g.util_gpu:"—");
+  se("fe-util-s",g.util_mem!==undefined?g.util_mem+"% mem util":"compute");
 
-  setEl('fe-gpu', d.gpu_mem||'—');
-  setEl('fe-pct', Math.round(d.progress||0));
-  setEl('fe-preds', ((d.examples_done||0)/1000).toFixed(1)+'k preds');
-  setEl('fe-tasks', (d.tasks_done||0)+'/21 tasks');
-  setEl('fe-eta', d.eta||'—');
-  const bar = document.getElementById('fe-bar');
-  if (bar) bar.style.width = (d.progress||0)+'%';
+  const memGB=g.mem_used?Math.round(g.mem_used/1024):null;
+  se("fe-mem-used",memGB||"—");
+  se("fe-mem-pct",g.mem_used&&g.mem_total?Math.round(g.mem_used/g.mem_total*100):"—");
 
-  if (d.log?.length) {
-    const lb = document.getElementById('fe-log');
-    lb.innerHTML = d.log.map(l=>`<div><span class="hi">›</span> ${esc(l)}</div>`).join('');
-    lb.scrollTop = lb.scrollHeight;
+  se("fe-temp",g.temp!==undefined?g.temp:"—");
+  const tempEl=document.getElementById("fe-temp");
+  if(tempEl&&g.temp){tempEl.style.color=g.temp>80?C.r:g.temp>70?C.y:C.g}
+  se("fe-temp-s",g.temp?(g.temp<60?"cool":g.temp<75?"nominal":"warm"):"thermal");
+
+  se("fe-power",g.power?Math.round(g.power):"—");
+  se("fe-power-pct",g.power&&g.power_limit?Math.round(g.power/g.power_limit*100):"—");
+
+  se("fe-tps",d.tps||"—");
+  se("fe-rate",(d.rate_per_min||"—")+" /min");
+
+  const pct=d.progress||0;
+  se("fe-pct",Math.round(pct));
+  se("fe-preds",((d.examples_done||0)/1000).toFixed(1)+"k of 52.25k");
+  se("fe-eta",d.eta||"—");
+  const bar=document.getElementById("fe-bar");
+  if(bar)bar.style.width=pct+"%";
+
+  // GPU history sparklines
+  if(g.util_gpu!==undefined){
+    feGpuHist.push(g.util_gpu);if(feGpuHist.length>30)feGpuHist.shift();
+    document.getElementById("fe-ghe").style.display="none";
+    const lbls=feGpuHist.map((_,i)=>i);
+    mkCh("fe-gpu-hist","line",{labels:lbls,datasets:[{data:feGpuHist,borderColor:C.g,backgroundColor:CL.g,fill:true,tension:.4,pointRadius:0,borderWidth:2}]},
+      baseOpts({scales:{x:{display:false},y:{min:0,max:100,grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc",callback:v=>v+"%"}}}}));
+  }
+  if(d.tps){
+    feTpsHist.push(d.tps);if(feTpsHist.length>30)feTpsHist.shift();
+    document.getElementById("fe-the").style.display="none";
+    const lbls2=feTpsHist.map((_,i)=>i);
+    mkCh("fe-tps-hist","line",{labels:lbls2,datasets:[{data:feTpsHist,borderColor:C.pi,backgroundColor:"rgba(219,39,119,.1)",fill:true,tension:.4,pointRadius:0,borderWidth:2}]},
+      baseOpts({scales:{x:{display:false},y:{min:0,grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc",callback:v=>v+"t/s"}}}}));
   }
 
-  if (d.results?.length) {
-    document.getElementById('fe-score-empty').style.display='none';
-    const snap = d.results.find(r=>r.method==='snap_256')?.score||null;
+  // Log
+  if(d.log?.length){const lb=document.getElementById("fe-log");lb.innerHTML=d.log.map(l=>`<div><span class="hi">›</span> ${esc(l)}</div>`).join("");lb.scrollTop=lb.scrollHeight}
 
-    const lbls = d.results.map(r=>r.method.replace('d0.1_w128_r0_','w128·').replace('d0.1_w128_r64_','w128r·').replace('d01_r0_','d01·').replace('snap_','snap·').replace('value_norm_only_','vnorm·').replace('uniform_recent_','recent·'));
-    const vals = d.results.map(r=>+(r.score||0).toFixed(1));
-    const cols = vals.map(v=>v>=(snap||88)?P.g:v>=(snap||88)*.97?P.b:P.y);
+  // Results
+  if(d.results?.length){
+    document.getElementById("fe-se").style.display="none";
+    const snap=(d.results.find(r=>r.method==="snap_256")||{}).score||null;
+    const lbls=d.results.map(r=>r.method.replace("d0.1_w128_r64_","w128r·").replace("d0.1_w128_r0_","w128·").replace("d01_r0_","d01·").replace("snap_","snap·").replace("value_norm_only_","vnorm·").replace("uniform_recent_","recent·"));
+    const vals=d.results.map(r=>+(r.score||0).toFixed(1));
+    const cols=vals.map(v=>v>=(snap||88)?C.g:v>=(snap||88)*.97?C.b:C.y);
+    mkCh("fe-score","bar",{labels:lbls,datasets:[{data:vals,backgroundColor:cols,borderRadius:5,borderSkipped:false}]},
+      baseOpts({scales:{x:{grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc",maxRotation:40,font:{size:9}}},y:{min:Math.min(...vals.filter(Boolean))*.975,grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc"}}}}));
 
-    mkChart('fe-score-chart','bar',{labels:lbls,datasets:[{data:vals,backgroundColor:cols,borderRadius:5,borderSkipped:false}]},
-      baseOpts({scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#ccc',maxRotation:40,font:{size:9}}},y:{min:Math.min(...vals.filter(Boolean))*.97,grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb'}}}}));
-
-    const mems = d.results.map(r=>r.mem||0);
-    if (mems.some(Boolean)) {
-      document.getElementById('fe-mem-empty').style.display='none';
-      mkChart('fe-mem-chart','bar',{labels:lbls,datasets:[{data:mems,backgroundColor:L.b,borderColor:P.b,borderWidth:1.5,borderRadius:4,borderSkipped:false}]},
-        baseOpts({scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#ccc',maxRotation:40,font:{size:9}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb'}}}}));
+    const mems=d.results.map(r=>r.mem||0);
+    if(mems.some(Boolean)){
+      document.getElementById("fe-me").style.display="none";
+      mkCh("fe-mem","bar",{labels:lbls,datasets:[{data:mems,backgroundColor:CL.b,borderColor:C.b,borderWidth:1.5,borderRadius:4,borderSkipped:false}]},
+        baseOpts({scales:{x:{grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc",maxRotation:40,font:{size:9}}},y:{grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc"}}}}));
     }
 
-    const tbody = document.getElementById('fe-table');
-    tbody.innerHTML = d.results.map(r=>{
-      const diff = snap!=null?(r.score-snap):null;
-      const cl = diff==null?'neu':diff>.5?'pos':diff<-.5?'neg':'neu';
-      return `<tr><td class="mono">${r.method}</td><td>${(r.score||0).toFixed(1)}</td><td class="${cl}">${diff!=null?(diff>=0?'+':'')+diff.toFixed(1):'—'}</td></tr>`;
-    }).join('');
+    document.getElementById("fe-tbl").innerHTML=d.results.map(r=>{
+      const diff=snap!=null?+(r.score-snap).toFixed(1):null;
+      const cl=diff==null?"neu":diff>.5?"pos":diff<-.5?"neg":"neu";
+      return`<tr><td class="mono">${r.method}</td><td>${(r.score||0).toFixed(1)}</td><td class="${cl}">${diff!=null?(diff>=0?"+":"")+diff:"—"}</td><td style="color:var(--m)">${r.mem||"—"}</td></tr>`;
+    }).join("");
   }
 }
 
-function updateDCS(d) {
-  const s = d.status||'OFFLINE';
-  const p = document.getElementById('dcs-pill');
-  p.textContent = s;
-  p.className = 'pill ' + (s==='RUNNING'||s==='Running'?'pill-run':s==='DONE'?'pill-done':s==='PAUSED'?'pill-wait':'pill-off');
+function updateDCS(d){
+  const st=d.status||"OFFLINE";
+  const p=document.getElementById("dcs-pill");
+  p.textContent=st;p.className="pill "+(st==="RUNNING"||st==="Running"?"pr":st==="DONE"?"pd":st==="PAUSED"?"pw":"po");
 
-  setEl('dcs-gpu', d.gpu_mem||'—');
-  setEl('dcs-step', d.step||'—');
-  setEl('dcs-arm', d.arm ? 'Arm: '+d.arm : '—');
-  setEl('dcs-vgap', d.validity_gap!=null ? d.validity_gap.toFixed(3) : '—');
-  setEl('dcs-p8', d.pass8!=null ? d.pass8.toFixed(3) : '—');
-  setEl('dcs-p1', d.pass1!=null ? 'Pass@1: '+d.pass1.toFixed(3) : 'Pass@1: —');
+  const g=d.gpu||{};
+  const utilPct=g.util_gpu!==undefined?g.util_gpu:(d.gpu_util||0);
+  const memGB=g.mem_used?Math.round(g.mem_used/1024):Math.round(parseInt(d.gpu_mem||"0")||0);
+  se("dcs-util",utilPct!==undefined?utilPct:"—");
+  se("dcs-mem",memGB||"—");
+  se("dcs-step",d.step||"—");
+  se("dcs-arm",d.arm?"Arm: "+d.arm:"—");
+  se("dcs-vgap",d.validity_gap!=null?d.validity_gap.toFixed(3):"—");
+  se("dcs-p8",d.pass8!=null?d.pass8.toFixed(3):"—");
+  se("dcs-p1",d.pass1!=null?"Pass@1: "+d.pass1.toFixed(3):"Pass@1: —");
 
-  if (d.arm && d.step) {
-    if (!dcsHist[d.arm]) dcsHist[d.arm]=[];
-    const last = dcsHist[d.arm].at(-1);
-    if (!last||last.x!==d.step) dcsHist[d.arm].push({x:d.step,y:+(d.validity_gap||0).toFixed(3)});
+  if(d.arm&&d.step){
+    if(!dcsHist[d.arm])dcsHist[d.arm]=[];
+    const last=dcsHist[d.arm].at(-1);
+    if(!last||last.x!==d.step)dcsHist[d.arm].push({x:d.step,y:+(d.validity_gap||0).toFixed(3)});
     renderDCSVgap();
   }
 
-  if (d.results?.length) {
-    document.getElementById('dcs-compare-empty').style.display='none';
-    const lbls = d.results.map(r=>r.arm);
-    mkChart('dcs-compare-chart','bar',{labels:lbls,datasets:[
-      {label:'Pass@8',data:d.results.map(r=>r.pass8),backgroundColor:L.b,borderColor:P.b,borderWidth:1.5,borderRadius:4,borderSkipped:false},
-      {label:'CoT@8', data:d.results.map(r=>r.cot_pass8),backgroundColor:L.g,borderColor:P.g,borderWidth:1.5,borderRadius:4,borderSkipped:false}
-    ]},{...baseOpts(),plugins:{legend:{display:true,labels:{color:'#aaa',font:{size:10},boxWidth:10,boxHeight:10}},tooltip:{backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#111',bodyColor:'#555',padding:10,cornerRadius:8}}});
+  if(d.results?.length){
+    document.getElementById("dcs-ce").style.display="none";
+    const pal=[C.b,C.g,C.p,C.y];
+    mkCh("dcs-compare","bar",{labels:d.results.map(r=>r.arm),datasets:[
+      {label:"Pass@8",data:d.results.map(r=>r.pass8),backgroundColor:CL.b,borderColor:C.b,borderWidth:1.5,borderRadius:4,borderSkipped:false},
+      {label:"CoT@8",data:d.results.map(r=>r.cot_pass8),backgroundColor:CL.g,borderColor:C.g,borderWidth:1.5,borderRadius:4,borderSkipped:false}
+    ]},{...baseOpts(),plugins:{legend:{display:true,labels:{color:"#aaa",font:{size:10},boxWidth:10,boxHeight:10}},tooltip:{backgroundColor:"#fff",borderColor:"rgba(0,0,0,.1)",borderWidth:1,titleColor:"#111",bodyColor:"#555",padding:10,cornerRadius:8}}});
 
-    const tbody = document.getElementById('dcs-table');
-    const pal = [P.b,P.g,P.p,P.y];
-    tbody.innerHTML = d.results.map((r,i)=>{
-      const vg=r.validity_gap; const cl=vg<.05?'pos':vg>.15?'neg':'neu';
-      const sig=vg<.05?'✓ Low FP rate':vg>.2?'✗ High FP rate':'~ Moderate';
-      return `<tr><td class="mono" style="color:${pal[i%4]}">${r.arm}</td><td>${r.pass1.toFixed(3)}</td><td>${r.pass8.toFixed(3)}</td><td>${r.cot_pass8.toFixed(3)}</td><td class="${cl}">${vg.toFixed(3)}</td><td style="color:var(--muted);font-size:11px">${sig}</td></tr>`;
-    }).join('');
+    document.getElementById("dcs-tbl").innerHTML=d.results.map((r,i)=>{
+      const vg=r.validity_gap;const cl=vg<.05?"pos":vg>.15?"neg":"neu";
+      const sig=vg<.05?"✓ Low FP rate":vg>.2?"✗ High FP rate":"~ Moderate";
+      return`<tr><td class="mono" style="color:${pal[i%4]}">${r.arm}</td><td>${r.pass1.toFixed(3)}</td><td>${r.pass8.toFixed(3)}</td><td>${r.cot_pass8.toFixed(3)}</td><td class="${cl}">${vg.toFixed(3)}</td><td style="color:var(--m);font-size:11px">${sig}</td></tr>`;
+    }).join("");
   }
 }
 
-function renderDCSVgap() {
-  const arms = Object.keys(dcsHist);
-  if (!arms.length) return;
-  document.getElementById('dcs-vgap-empty').style.display='none';
-  const pal = [P.b,P.g,P.p,P.y];
-  const datasets = arms.map((arm,i)=>({
-    label:arm, data:dcsHist[arm],
-    borderColor:pal[i%4], backgroundColor:'transparent',
-    tension:0.4, pointRadius:3, pointBackgroundColor:pal[i%4], borderWidth:2
-  }));
-  mkChart('dcs-vgap-chart','line',{datasets},{
+function renderDCSVgap(){
+  const arms=Object.keys(dcsHist);if(!arms.length)return;
+  document.getElementById("dcs-ve").style.display="none";
+  const pal=[C.b,C.g,C.p,C.y];
+  const lpal=["rgba(37,99,235,.1)","rgba(22,163,74,.1)","rgba(124,58,237,.1)","rgba(180,83,9,.1)"];
+  mkCh("dcs-vgap-c","line",{datasets:arms.map((arm,i)=>({label:arm,data:dcsHist[arm],borderColor:pal[i%4],backgroundColor:lpal[i%4],fill:true,tension:.4,pointRadius:3,pointBackgroundColor:pal[i%4],borderWidth:2}))},{
     ...baseOpts(),
-    plugins:{legend:{display:true,labels:{color:'#aaa',font:{size:10},boxWidth:10,boxHeight:10}},tooltip:{backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#111',bodyColor:'#555',padding:10,cornerRadius:8}},
-    scales:{
-      x:{type:'linear',title:{display:true,text:'Step',color:'#ccc',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb'}},
-      y:{title:{display:true,text:'Validity Gap',color:'#ccc',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb'}}
-    }
+    plugins:{legend:{display:true,labels:{color:"#aaa",font:{size:10},boxWidth:10,boxHeight:10}},tooltip:{backgroundColor:"#fff",borderColor:"rgba(0,0,0,.1)",borderWidth:1,titleColor:"#111",bodyColor:"#555",padding:10,cornerRadius:8}},
+    scales:{x:{type:"linear",title:{display:true,text:"Step",color:"#ccc",font:{size:10}},grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc"}},y:{title:{display:true,text:"Validity Gap",color:"#ccc",font:{size:10}},grid:{color:"rgba(0,0,0,.04)"},ticks:{color:"#ccc"}}}
   });
 }
 
-function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-
-// ── Poll ────────────────────────────────────────────────────────
-async function poll() {
-  try {
-    const r = await fetch('/api/status',{cache:'no-store'});
-    const d = await r.json();
-    if (d.flash_evict) updateFE(d.flash_evict);
-    if (d.dcs) updateDCS(d.dcs);
-    document.getElementById('nav-time').textContent = new Date(d.timestamp).toLocaleTimeString();
-  } catch(e) {
-    document.getElementById('nav-time').textContent = 'offline';
-  }
+async function poll(){
+  try{
+    const r=await fetch("/api/status",{cache:"no-store"});
+    const d=await r.json();
+    if(d.flash_evict)updateFE(d.flash_evict);
+    if(d.dcs)updateDCS(d.dcs);
+    document.getElementById("nt").textContent=new Date(d.timestamp).toLocaleTimeString();
+  }catch(e){document.getElementById("nt").textContent="offline"}
 }
 
 poll();
-setInterval(poll, 30000);
+setInterval(poll,15000);
 </script>
 </body>
 </html>
