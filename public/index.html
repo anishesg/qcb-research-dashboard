@@ -3,605 +3,470 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>QCB Research</title>
+<title>ICLR Research</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
   :root {
     --bg: #ffffff;
-    --surface: #f7f7f9;
+    --surface: #f8f8fa;
     --border: rgba(0,0,0,0.07);
-    --border-hover: rgba(0,0,0,0.14);
-    --text: #111111;
-    --muted: #888;
-    --subtle: #ddd;
-    --green: #2d9e5f;
-    --blue: #3478c8;
-    --purple: #7c4fd4;
-    --pink: #d44f8a;
-    --yellow: #b87a00;
-    --red: #d44f4f;
-    --white: #111111;
+    --border-h: rgba(0,0,0,0.13);
+    --text: #0a0a0a;
+    --muted: #8a8a8a;
+    --subtle: #e5e5e5;
+    --green: #16a34a;
+    --blue: #2563eb;
+    --purple: #7c3aed;
+    --yellow: #b45309;
+    --red: #dc2626;
+    --pink: #db2777;
   }
 
-  * { margin:0; padding:0; box-sizing:border-box; }
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 
   body {
     background: var(--bg);
     color: var(--text);
-    font-family: 'Inter', -apple-system, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
     font-size: 13px;
     line-height: 1.5;
-    min-height: 100vh;
-    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
   }
 
-  /* TOP BAR */
+  /* NAV */
   nav {
+    height: 50px;
     display: flex;
     align-items: center;
     padding: 0 28px;
-    height: 52px;
+    gap: 16px;
     border-bottom: 1px solid var(--border);
-    gap: 20px;
     position: sticky;
     top: 0;
-    background: rgba(255,255,255,0.92);
+    background: rgba(255,255,255,0.88);
+    backdrop-filter: saturate(180%) blur(20px);
     z-index: 100;
-    backdrop-filter: blur(20px);
   }
-  .nav-logo {
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    color: var(--white);
-    text-transform: uppercase;
-  }
-  .nav-sep { width: 1px; height: 16px; background: var(--border); }
-  .nav-label { font-size: 11px; color: var(--muted); font-weight: 400; }
-  .live-dot {
-    width: 6px; height: 6px; border-radius: 50%;
-    background: var(--green);
-    box-shadow: 0 0 8px var(--green);
-    animation: pulse 2s infinite;
+  .logo { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--text); }
+  .nav-divider { width: 1px; height: 14px; background: var(--border); }
+  .nav-sub { font-size: 12px; color: var(--muted); }
+  .live-badge {
     margin-left: auto;
-  }
-  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(0.8)} }
-  .nav-time { font-size: 11px; color: var(--muted); }
-
-  /* LAYOUT */
-  .main { padding: 24px 28px; display: flex; flex-direction: column; gap: 20px; }
-
-  /* SECTION HEADER */
-  .section-header {
     display: flex;
-    align-items: baseline;
-    gap: 10px;
-    margin-bottom: 14px;
-  }
-  .section-title {
+    align-items: center;
+    gap: 6px;
     font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
     color: var(--muted);
   }
-  .section-name {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text);
+  .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--green);
+    animation: blink 2s infinite;
   }
-  .status-pill {
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 20px;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-  .pill-running { background: rgba(45,158,95,0.1); color: var(--green); }
-  .pill-paused  { background: rgba(184,122,0,0.1); color: var(--yellow); }
-  .pill-done    { background: rgba(52,120,200,0.1); color: var(--blue); }
-  .pill-offline { background: rgba(0,0,0,0.05); color: var(--muted); }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-  /* CARDS */
-  .card {
+  /* LAYOUT */
+  .page { max-width: 1300px; margin: 0 auto; padding: 28px 28px 60px; }
+
+  /* SECTION */
+  .exp-section { margin-bottom: 40px; }
+  .exp-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .exp-num { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.1em; }
+  .exp-name { font-size: 14px; font-weight: 600; color: var(--text); }
+  .exp-tag { font-size: 10px; color: var(--muted); background: var(--surface); border: 1px solid var(--border); padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+
+  /* STATUS PILLS */
+  .pill { font-size: 9.5px; font-weight: 700; padding: 3px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.07em; }
+  .pill-run  { background: #dcfce7; color: #15803d; }
+  .pill-done { background: #dbeafe; color: #1d4ed8; }
+  .pill-wait { background: #fef9c3; color: #854d0e; }
+  .pill-off  { background: var(--surface); color: var(--muted); border: 1px solid var(--border); }
+
+  /* STAT ROW */
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .stat {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 20px;
-    transition: border-color 0.2s;
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color 0.15s;
   }
-  .card:hover { border-color: var(--border-hover); }
+  .stat:hover { border-color: var(--border-h); }
+  .stat-l { font-size: 9.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 5px; }
+  .stat-v { font-size: 24px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; line-height: 1; }
+  .stat-s { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .c-g { color: var(--green); }
+  .c-b { color: var(--blue); }
+  .c-p { color: var(--purple); }
+  .c-y { color: var(--yellow); }
 
-  /* GRID LAYOUTS */
-  .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
-  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .grid-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 16px; }
+  /* PROGRESS */
+  .prog-row { display: flex; justify-content: space-between; margin-bottom: 4px; }
+  .prog-row span { font-size: 10px; color: var(--muted); }
+  .prog-track { height: 3px; background: var(--subtle); border-radius: 2px; overflow: hidden; }
+  .prog-fill { height: 100%; border-radius: 2px; background: linear-gradient(90deg, var(--blue), var(--purple)); transition: width 0.8s ease; }
 
-  /* STAT CARDS */
-  .stat-card {
+  /* CHARTS GRID */
+  .charts-3 { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .charts-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .chart-card {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: 10px;
     padding: 16px 18px;
   }
-  .stat-label { font-size: 10px; font-weight: 500; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
-  .stat-value { font-size: 26px; font-weight: 700; color: var(--text); letter-spacing: -0.02em; line-height: 1; }
-  .stat-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
-  .stat-accent { color: var(--green); }
-  .stat-accent-blue { color: var(--blue); }
-  .stat-accent-purple { color: var(--purple); }
-  .stat-accent-yellow { color: var(--yellow); }
+  .chart-card:hover { border-color: var(--border-h); }
+  .chart-label { font-size: 10px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 12px; }
+  canvas { max-height: 185px; }
+  .chart-tall canvas { max-height: 230px; }
 
-  /* PROGRESS BAR */
-  .progress-wrap { margin-top: 10px; }
-  .progress-label { display: flex; justify-content: space-between; margin-bottom: 5px; }
-  .progress-label span { font-size: 10px; color: var(--muted); }
-  .progress-track { height: 3px; background: var(--subtle); border-radius: 2px; overflow: hidden; }
-  .progress-fill {
-    height: 100%;
-    border-radius: 2px;
-    background: linear-gradient(90deg, var(--green), var(--blue));
-    transition: width 1s ease;
-  }
-
-  /* CHART CONTAINERS */
-  .chart-wrap {
-    position: relative;
-    padding: 18px;
+  /* TABLE CARD */
+  .table-card {
     background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 10px;
+    padding: 16px 18px;
   }
-  .chart-title {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    margin-bottom: 14px;
-  }
-  canvas { max-height: 180px; }
-  .chart-tall canvas { max-height: 240px; }
-
-  /* TABLE */
-  .data-table { width: 100%; border-collapse: collapse; }
-  .data-table th {
-    text-align: left;
-    font-size: 10px;
-    font-weight: 500;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 0 0 10px;
-    border-bottom: 1px solid var(--border);
-  }
-  .data-table td {
-    padding: 9px 0;
-    font-size: 12px;
-    border-bottom: 1px solid var(--border);
-    color: var(--text);
-  }
-  .data-table tr:last-child td { border-bottom: none; }
-  .data-table .method { font-family: 'SF Mono', monospace; font-size: 11px; color: var(--blue); }
-  .tag-win { color: var(--green); font-weight: 600; }
-  .tag-lose { color: var(--red); }
-  .tag-neutral { color: var(--muted); }
-
-  /* DIVIDER */
-  .divider { height: 1px; background: var(--border); margin: 4px 0; }
+  table { width: 100%; border-collapse: collapse; }
+  th { text-align: left; font-size: 9.5px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.09em; padding: 0 0 9px; border-bottom: 1px solid var(--border); }
+  td { padding: 8px 0; font-size: 12px; color: var(--text); border-bottom: 1px solid var(--border); }
+  tr:last-child td { border-bottom: none; }
+  .mono { font-family: 'SF Mono', 'Fira Code', monospace; font-size: 11px; color: var(--blue); }
+  .pos { color: var(--green); font-weight: 600; }
+  .neg { color: var(--red); }
+  .neu { color: var(--muted); }
 
   /* LOG */
-  .log-stream {
-    background: #f4f4f6;
+  .log-card {
+    background: var(--surface);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 12px 14px;
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 12px;
+  }
+  .log-inner {
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
     font-family: 'SF Mono', 'Fira Code', monospace;
     font-size: 10.5px;
     color: var(--muted);
-    max-height: 100px;
+    max-height: 90px;
     overflow-y: auto;
     line-height: 1.7;
+    margin-top: 10px;
   }
-  .log-stream .log-hi { color: var(--green); }
+  .log-inner .hi { color: var(--green); }
 
   /* EMPTY */
-  .empty { color: var(--subtle); font-size: 11px; padding: 20px 0; text-align: center; }
+  .empty-state { text-align: center; padding: 24px 0; color: var(--subtle); font-size: 12px; }
 
-  /* EXPERIMENT SECTION */
-  .experiment { margin-bottom: 4px; }
+  /* SEP */
+  .sep { height: 1px; background: var(--border); margin: 8px 0 28px; }
 
-  /* RESPONSIVE */
   @media(max-width:900px) {
-    .grid-4 { grid-template-columns: repeat(2,1fr); }
-    .grid-3 { grid-template-columns: 1fr; }
-    .grid-2 { grid-template-columns: 1fr; }
+    .stats { grid-template-columns: 1fr 1fr; }
+    .charts-3, .charts-2 { grid-template-columns: 1fr; }
   }
 </style>
 </head>
 <body>
 
 <nav>
-  <span class="nav-logo">QCB</span>
-  <span class="nav-sep"></span>
-  <span class="nav-label">Research Dashboard</span>
-  <div class="live-dot"></div>
-  <span class="nav-time" id="nav-time">—</span>
+  <span class="logo">ICLR</span>
+  <span class="nav-divider"></span>
+  <span class="nav-sub">Research Dashboard</span>
+  <div class="live-badge">
+    <div class="dot"></div>
+    <span id="nav-time">Live</span>
+  </div>
 </nav>
 
-<div class="main">
+<div class="page">
 
   <!-- ── FLASH-EVICT ── -->
-  <div class="experiment">
-    <div class="section-header">
-      <span class="section-title">Experiment 01</span>
-      <span class="section-name">Flash-Evict · Fused Prefill KV Eviction</span>
-      <span class="status-pill pill-running" id="fe-pill">RUNNING</span>
+  <div class="exp-section">
+    <div class="exp-header">
+      <span class="exp-num">01</span>
+      <span class="exp-name">Flash-Evict · Fused Prefill KV Cache Eviction</span>
+      <span class="exp-tag">Blackwell 96 GB</span>
+      <span class="pill pill-run" id="fe-pill">Running</span>
     </div>
 
-    <div class="grid-4" style="margin-bottom:12px">
-      <div class="stat-card">
-        <div class="stat-label">GPU Memory</div>
-        <div class="stat-value stat-accent" id="fe-gpu">—</div>
-        <div class="stat-sub">Blackwell 96 GB</div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-l">GPU Memory</div>
+        <div class="stat-v c-g" id="fe-gpu">—</div>
+        <div class="stat-s">NVIDIA RTX PRO 6000</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Progress</div>
-        <div class="stat-value" id="fe-pct">0<span style="font-size:14px;font-weight:400;color:var(--muted)">%</span></div>
-        <div class="progress-wrap">
-          <div class="progress-track"><div class="progress-fill" id="fe-bar" style="width:0%"></div></div>
+      <div class="stat">
+        <div class="stat-l">Progress</div>
+        <div class="stat-v c-b"><span id="fe-pct">0</span><span style="font-size:14px;font-weight:400;color:var(--muted)"> %</span></div>
+        <div style="margin-top:8px">
+          <div class="prog-row"><span id="fe-preds">0</span><span id="fe-tasks">0/21 tasks</span></div>
+          <div class="prog-track"><div class="prog-fill" id="fe-bar" style="width:0%"></div></div>
         </div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Tasks / Examples</div>
-        <div class="stat-value stat-accent-blue"><span id="fe-tasks">0</span><span style="font-size:14px;font-weight:400;color:var(--muted)">/21</span></div>
-        <div class="stat-sub"><span id="fe-preds">0</span> predictions</div>
+      <div class="stat">
+        <div class="stat-l">Model</div>
+        <div class="stat-v" style="font-size:15px;padding-top:4px">Qwen2.5-7B</div>
+        <div class="stat-s">+ Llama-3.1-8B queued</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">ETA</div>
-        <div class="stat-value stat-accent-purple" id="fe-eta">—</div>
-        <div class="stat-sub">Qwen2.5-7B-Instruct</div>
+      <div class="stat">
+        <div class="stat-l">ETA</div>
+        <div class="stat-v c-p" id="fe-eta">—</div>
+        <div class="stat-s">LongBench · 21 tasks</div>
       </div>
     </div>
 
-    <div class="grid-3">
-      <!-- Score chart -->
-      <div class="chart-wrap chart-tall">
-        <div class="chart-title">LongBench Score by Method</div>
-        <canvas id="fe-bar-chart"></canvas>
-        <div class="empty" id="fe-chart-empty">Waiting for results...</div>
+    <div class="charts-3">
+      <div class="chart-card chart-tall">
+        <div class="chart-label">Score by Method</div>
+        <canvas id="fe-score-chart"></canvas>
+        <div class="empty-state" id="fe-score-empty">Waiting for results…</div>
       </div>
-
-      <!-- Memory comparison -->
-      <div class="chart-wrap">
-        <div class="chart-title">Memory @ 131K ctx (MiB)</div>
+      <div class="chart-card">
+        <div class="chart-label">Memory @ 131K (MiB)</div>
         <canvas id="fe-mem-chart"></canvas>
-        <div class="empty" id="fe-mem-empty">—</div>
+        <div class="empty-state" id="fe-mem-empty">—</div>
       </div>
-
-      <!-- Results table -->
-      <div class="card" style="padding:18px 20px">
-        <div class="chart-title">Method Comparison</div>
-        <table class="data-table">
-          <thead><tr><th>Method</th><th>Score</th><th>vs Snap</th></tr></thead>
-          <tbody id="fe-table"><tr><td colspan="3" class="empty">—</td></tr></tbody>
+      <div class="table-card">
+        <div class="chart-label" style="margin-bottom:10px">vs SnapKV Baseline</div>
+        <table>
+          <thead><tr><th>Method</th><th>Score</th><th>Delta</th></tr></thead>
+          <tbody id="fe-table"><tr><td colspan="3" class="empty-state">—</td></tr></tbody>
         </table>
       </div>
     </div>
 
-    <div style="margin-top:12px">
-      <div class="chart-wrap">
-        <div class="chart-title">Live Log</div>
-        <div class="log-stream" id="fe-log">Connecting...</div>
-      </div>
+    <div class="log-card">
+      <div class="chart-label">Live Output</div>
+      <div class="log-inner" id="fe-log">Connecting…</div>
     </div>
   </div>
 
-  <div class="divider" style="margin:8px 0 20px"></div>
+  <div class="sep"></div>
 
   <!-- ── DCS ── -->
-  <div class="experiment">
-    <div class="section-header">
-      <span class="section-title">Experiment 02</span>
-      <span class="section-name">DCS · Diverse Correct Solutions RL</span>
-      <span class="status-pill pill-running" id="dcs-pill">RUNNING</span>
+  <div class="exp-section">
+    <div class="exp-header">
+      <span class="exp-num">02</span>
+      <span class="exp-name">DCS · Diverse Correct Solutions RL Training</span>
+      <span class="exp-tag">Oregon A10G</span>
+      <span class="pill pill-run" id="dcs-pill">Running</span>
     </div>
 
-    <div class="grid-4" style="margin-bottom:12px">
-      <div class="stat-card">
-        <div class="stat-label">GPU Memory</div>
-        <div class="stat-value stat-accent" id="dcs-gpu">—</div>
-        <div class="stat-sub">Oregon A10G 24 GB</div>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-l">GPU Memory</div>
+        <div class="stat-v c-g" id="dcs-gpu">—</div>
+        <div class="stat-s">NVIDIA A10G 24 GB</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Current Step</div>
-        <div class="stat-value stat-accent-blue" id="dcs-step">—</div>
-        <div class="stat-sub" id="dcs-arm">—</div>
+      <div class="stat">
+        <div class="stat-l">Step / Arm</div>
+        <div class="stat-v c-b" id="dcs-step">—</div>
+        <div class="stat-s" id="dcs-arm">—</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Validity Gap</div>
-        <div class="stat-value stat-accent-yellow" id="dcs-vgap">—</div>
-        <div class="stat-sub">pass@8 − cot@8</div>
+      <div class="stat">
+        <div class="stat-l">Validity Gap ↓</div>
+        <div class="stat-v c-y" id="dcs-vgap">—</div>
+        <div class="stat-s">pass@8 − cot@8</div>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Pass@8</div>
-        <div class="stat-value" id="dcs-p8">—</div>
-        <div class="stat-sub" id="dcs-p1">Pass@1: —</div>
+      <div class="stat">
+        <div class="stat-l">Pass@8 / Pass@1</div>
+        <div class="stat-v" id="dcs-p8">—</div>
+        <div class="stat-s" id="dcs-p1">Pass@1: —</div>
       </div>
     </div>
 
-    <div class="grid-2">
-      <!-- Validity gap over time -->
-      <div class="chart-wrap">
-        <div class="chart-title">Validity Gap per Arm over Training</div>
+    <div class="charts-2">
+      <div class="chart-card">
+        <div class="chart-label">Validity Gap over Training Steps</div>
         <canvas id="dcs-vgap-chart"></canvas>
-        <div class="empty" id="dcs-vgap-empty">Training in progress...</div>
+        <div class="empty-state" id="dcs-vgap-empty">Training in progress…</div>
       </div>
-
-      <!-- Final arm comparison -->
-      <div class="chart-wrap">
-        <div class="chart-title">Final Results — Pass@8 vs CoT@8</div>
+      <div class="chart-card">
+        <div class="chart-label">Pass@8 vs CoT@8 — Final Results</div>
         <canvas id="dcs-compare-chart"></canvas>
-        <div class="empty" id="dcs-compare-empty">—</div>
+        <div class="empty-state" id="dcs-compare-empty">Awaiting final arms…</div>
       </div>
     </div>
 
-    <div style="margin-top:12px">
-      <div class="card" style="padding:18px 20px">
-        <div class="chart-title" style="margin-bottom:12px">Arm Comparison</div>
-        <table class="data-table">
-          <thead><tr><th>Arm</th><th>Pass@1</th><th>Pass@8</th><th>CoT@8</th><th>vGap</th><th>Hypothesis</th></tr></thead>
-          <tbody id="dcs-table"><tr><td colspan="6" class="empty">Waiting for results...</td></tr></tbody>
-        </table>
-      </div>
+    <div class="table-card">
+      <div class="chart-label" style="margin-bottom:10px">Arm Comparison</div>
+      <table>
+        <thead><tr><th>Method</th><th>Pass@1</th><th>Pass@8</th><th>CoT@8</th><th>vGap</th><th>Signal</th></tr></thead>
+        <tbody id="dcs-table"><tr><td colspan="6" class="empty-state">Waiting for results…</td></tr></tbody>
+      </table>
     </div>
   </div>
 
 </div>
 
 <script>
-// ── Chart defaults ──────────────────────────────────────────────
-Chart.defaults.color = '#888';
-Chart.defaults.borderColor = 'rgba(0,0,0,0.06)';
+// ── Chart config ────────────────────────────────────────────────
 Chart.defaults.font.family = 'Inter, sans-serif';
-Chart.defaults.font.size = 11;
+Chart.defaults.font.size = 10.5;
+Chart.defaults.color = '#aaa';
+Chart.defaults.borderColor = 'rgba(0,0,0,0.06)';
 
-const PASTEL = {
-  green:  'rgba(168,230,180,0.9)',
-  blue:   'rgba(168,200,240,0.9)',
-  purple: 'rgba(200,168,240,0.9)',
-  pink:   'rgba(240,168,200,0.9)',
-  yellow: 'rgba(240,224,168,0.9)',
-  red:    'rgba(240,168,168,0.9)',
-};
-const PASTEL_DIM = Object.fromEntries(
-  Object.entries(PASTEL).map(([k,v]) => [k, v.replace('0.9','0.12')])
-);
+const P = { g:'#16a34a', b:'#2563eb', p:'#7c3aed', y:'#b45309', r:'#dc2626', k:'#db2777' };
+const L = { g:'rgba(22,163,74,0.1)', b:'rgba(37,99,235,0.1)', p:'rgba(124,58,237,0.1)', y:'rgba(180,83,9,0.1)', r:'rgba(220,38,38,0.1)' };
 
-function chartDefaults(extra={}) {
-  return {
-    responsive: true,
-    maintainAspectRatio: true,
-    plugins: { legend: { display: false }, tooltip: { backgroundColor:'#111', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10, titleFont:{size:11}, bodyFont:{size:11} } },
-    scales: {
-      x: { grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ color:'#444', font:{size:10} } },
-      y: { grid:{ color:'rgba(0,0,0,0.05)' }, ticks:{ color:'#444', font:{size:10} } }
-    },
-    ...extra
-  };
-}
+const baseOpts = (extra={}) => ({
+  responsive: true, maintainAspectRatio: true,
+  plugins: {
+    legend: { display: false },
+    tooltip: { backgroundColor:'#fff', borderColor:'rgba(0,0,0,0.1)', borderWidth:1, titleColor:'#111', bodyColor:'#555', padding:10, cornerRadius:8 }
+  },
+  scales: {
+    x: { grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ color:'#bbb' } },
+    y: { grid:{ color:'rgba(0,0,0,0.04)' }, ticks:{ color:'#bbb' } }
+  },
+  ...extra
+});
 
-// ── Chart instances ──────────────────────────────────────────────
-let charts = {};
-
-function makeChart(id, type, data, opts) {
-  const ctx = document.getElementById(id);
-  if (!ctx) return;
-  if (charts[id]) charts[id].destroy();
-  charts[id] = new Chart(ctx, { type, data, options: opts });
-  return charts[id];
-}
-
-// ── Flash-evict charts ──────────────────────────────────────────
-let feHistory = { labels:[], byMethod:{} };
-
-function updateFlashCharts(results) {
-  if (!results || !results.length) return;
-
-  // Hide empties
-  document.getElementById('fe-chart-empty').style.display = 'none';
-  document.getElementById('fe-mem-empty').style.display = 'none';
-
-  const labels = results.map(r => r.method.replace('d0.1_w128_r0_','w128·').replace('d01_r0_','d01·').replace('snap_','snap·').replace('value_norm_only_','vnorm·').replace('uniform_recent_','recent·'));
-  const scores = results.map(r => r.score || 0);
-  const mems   = results.map(r => r.mem || 0);
-
-  const snapScore = (results.find(r=>r.method==='snap_256')||{}).score || null;
-  const colors = scores.map(s => s >= (snapScore||90) ? PASTEL.green : s >= (snapScore||90)*0.97 ? PASTEL.blue : PASTEL.yellow);
-
-  makeChart('fe-bar-chart', 'bar', {
-    labels,
-    datasets: [{ data: scores, backgroundColor: colors, borderRadius: 4, borderSkipped: false }]
-  }, chartDefaults({ scales:{ x:{ grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#444',font:{size:9},maxRotation:45}}, y:{ min: Math.min(...scores.filter(Boolean))*0.97, grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#444',font:{size:10}} } } }));
-
-  if (mems.some(Boolean)) {
-    makeChart('fe-mem-chart', 'bar', {
-      labels,
-      datasets: [{ data: mems, backgroundColor: PASTEL_DIM.blue, borderColor: PASTEL.blue, borderWidth:1, borderRadius:4, borderSkipped:false }]
-    }, chartDefaults({ scales:{ x:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#444',font:{size:9},maxRotation:45}}, y:{grid:{color:'rgba(0,0,0,0.05)'},ticks:{color:'#444',font:{size:10}}} } }));
-  }
-}
-
-// ── DCS charts ──────────────────────────────────────────────────
-let dcsHistory = {};  // arm → [{step, vgap, p8, cot8}]
-
-function addDCSPoint(arm, step, vgap, p8, cot8) {
-  if (!arm || step === undefined) return;
-  if (!dcsHistory[arm]) dcsHistory[arm] = [];
-  const last = dcsHistory[arm].slice(-1)[0];
-  if (!last || last.step !== step) {
-    dcsHistory[arm].push({ step, vgap, p8, cot8 });
-  }
-  updateDCSCharts();
-}
-
-function updateDCSCharts() {
-  const arms = Object.keys(dcsHistory);
-  if (!arms.length) return;
-  document.getElementById('dcs-vgap-empty').style.display = 'none';
-
-  const palette = [PASTEL.blue, PASTEL.green, PASTEL.purple, PASTEL.yellow];
-  const datasets = arms.map((arm, i) => ({
-    label: arm,
-    data: dcsHistory[arm].map(p => ({ x: p.step, y: +(p.vgap||0).toFixed(3) })),
-    borderColor: palette[i % palette.length],
-    backgroundColor: 'transparent',
-    tension: 0.4,
-    pointRadius: 3,
-    pointBackgroundColor: palette[i % palette.length],
-    borderWidth: 2,
-  }));
-
-  makeChart('dcs-vgap-chart', 'line', { datasets }, {
-    ...chartDefaults(),
-    plugins: {
-      legend: { display: true, labels: { color:'#555', font:{size:10}, boxWidth:10 } },
-      tooltip: { backgroundColor:'#111', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10 }
-    },
-    scales: {
-      x: { type:'linear', title:{display:true,text:'Step',color:'#444',font:{size:10}}, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#444',font:{size:10}} },
-      y: { title:{display:true,text:'Validity Gap',color:'#444',font:{size:10}}, grid:{color:'rgba(0,0,0,0.05)'}, ticks:{color:'#444',font:{size:10}} }
-    }
-  });
-}
-
-function updateDCSCompare(results) {
-  if (!results || !results.length) return;
-  document.getElementById('dcs-compare-empty').style.display = 'none';
-
-  const labels = results.map(r => r.arm);
-  makeChart('dcs-compare-chart', 'bar', {
-    labels,
-    datasets: [
-      { label:'Pass@8', data: results.map(r=>r.pass8), backgroundColor: PASTEL_DIM.blue, borderColor: PASTEL.blue, borderWidth:1, borderRadius:4, borderSkipped:false },
-      { label:'CoT@8',  data: results.map(r=>r.cot_pass8), backgroundColor: PASTEL_DIM.green, borderColor: PASTEL.green, borderWidth:1, borderRadius:4, borderSkipped:false },
-    ]
-  }, {
-    ...chartDefaults(),
-    plugins: {
-      legend: { display:true, labels:{color:'#555',font:{size:10},boxWidth:10} },
-      tooltip: { backgroundColor:'#111', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10 }
-    }
-  });
-}
-
-// ── UI updaters ──────────────────────────────────────────────────
-function setEl(id, val) {
+let ch = {};
+function mkChart(id, type, data, opts) {
   const el = document.getElementById(id);
-  if (el && val !== undefined && val !== null) el.textContent = val;
+  if (!el) return;
+  if (ch[id]) ch[id].destroy();
+  ch[id] = new Chart(el, { type, data, options: opts });
 }
 
-function updateFlashUI(fe) {
-  const status = fe.status || 'OFFLINE';
-  const pill = document.getElementById('fe-pill');
-  pill.textContent = status;
-  pill.className = 'status-pill ' + (status==='RUNNING'?'pill-running':status==='DONE'?'pill-done':status==='PAUSED'?'pill-paused':'pill-offline');
+// ── DCS history ─────────────────────────────────────────────────
+const dcsHist = {};
 
-  setEl('fe-gpu', fe.gpu_mem || '—');
-  setEl('fe-tasks', fe.tasks_done || 0);
-  setEl('fe-preds', (fe.examples_done||0).toLocaleString());
-  setEl('fe-eta', fe.eta || '—');
+// ── Updaters ────────────────────────────────────────────────────
+function setEl(id, v) { const e=document.getElementById(id); if(e&&v!=null) e.textContent=v; }
 
-  const pct = fe.progress || 0;
-  setEl('fe-pct', Math.round(pct));
+function updateFE(d) {
+  const s = d.status||'OFFLINE';
+  const p = document.getElementById('fe-pill');
+  p.textContent = s;
+  p.className = 'pill ' + (s==='RUNNING'||s==='Running'?'pill-run':s==='DONE'?'pill-done':s==='PAUSED'?'pill-wait':'pill-off');
+
+  setEl('fe-gpu', d.gpu_mem||'—');
+  setEl('fe-pct', Math.round(d.progress||0));
+  setEl('fe-preds', ((d.examples_done||0)/1000).toFixed(1)+'k preds');
+  setEl('fe-tasks', (d.tasks_done||0)+'/21 tasks');
+  setEl('fe-eta', d.eta||'—');
   const bar = document.getElementById('fe-bar');
-  if (bar) bar.style.width = pct + '%';
+  if (bar) bar.style.width = (d.progress||0)+'%';
 
-  // Log
-  if (fe.log && fe.log.length) {
+  if (d.log?.length) {
     const lb = document.getElementById('fe-log');
-    lb.innerHTML = fe.log.map(l => `<div><span class="log-hi">›</span> ${escHtml(l)}</div>`).join('');
+    lb.innerHTML = d.log.map(l=>`<div><span class="hi">›</span> ${esc(l)}</div>`).join('');
     lb.scrollTop = lb.scrollHeight;
   }
 
-  // Table
-  if (fe.results && fe.results.length) {
-    const snap = (fe.results.find(r=>r.method==='snap_256')||{}).score || null;
+  if (d.results?.length) {
+    document.getElementById('fe-score-empty').style.display='none';
+    const snap = d.results.find(r=>r.method==='snap_256')?.score||null;
+
+    const lbls = d.results.map(r=>r.method.replace('d0.1_w128_r0_','w128·').replace('d0.1_w128_r64_','w128r·').replace('d01_r0_','d01·').replace('snap_','snap·').replace('value_norm_only_','vnorm·').replace('uniform_recent_','recent·'));
+    const vals = d.results.map(r=>+(r.score||0).toFixed(1));
+    const cols = vals.map(v=>v>=(snap||88)?P.g:v>=(snap||88)*.97?P.b:P.y);
+
+    mkChart('fe-score-chart','bar',{labels:lbls,datasets:[{data:vals,backgroundColor:cols,borderRadius:5,borderSkipped:false}]},
+      baseOpts({scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#ccc',maxRotation:40,font:{size:9}}},y:{min:Math.min(...vals.filter(Boolean))*.97,grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb'}}}}));
+
+    const mems = d.results.map(r=>r.mem||0);
+    if (mems.some(Boolean)) {
+      document.getElementById('fe-mem-empty').style.display='none';
+      mkChart('fe-mem-chart','bar',{labels:lbls,datasets:[{data:mems,backgroundColor:L.b,borderColor:P.b,borderWidth:1.5,borderRadius:4,borderSkipped:false}]},
+        baseOpts({scales:{x:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#ccc',maxRotation:40,font:{size:9}}},y:{grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb'}}}}));
+    }
+
     const tbody = document.getElementById('fe-table');
-    tbody.innerHTML = fe.results.map(r => {
-      const diff = snap !== null ? (r.score - snap) : null;
-      const cls = diff === null ? 'tag-neutral' : diff > 0.5 ? 'tag-win' : diff < -0.5 ? 'tag-lose' : 'tag-neutral';
-      const sign = diff !== null ? (diff >= 0 ? '+' : '') + diff.toFixed(1) : '—';
-      return `<tr>
-        <td class="method">${r.method}</td>
-        <td>${r.score.toFixed(1)}</td>
-        <td class="${cls}">${sign}</td>
-      </tr>`;
+    tbody.innerHTML = d.results.map(r=>{
+      const diff = snap!=null?(r.score-snap):null;
+      const cl = diff==null?'neu':diff>.5?'pos':diff<-.5?'neg':'neu';
+      return `<tr><td class="mono">${r.method}</td><td>${(r.score||0).toFixed(1)}</td><td class="${cl}">${diff!=null?(diff>=0?'+':'')+diff.toFixed(1):'—'}</td></tr>`;
     }).join('');
-    updateFlashCharts(fe.results);
   }
 }
 
-function updateDCSUI(dcs) {
-  const status = dcs.status || 'OFFLINE';
-  const pill = document.getElementById('dcs-pill');
-  pill.textContent = status;
-  pill.className = 'status-pill ' + (status==='RUNNING'?'pill-running':status==='DONE'?'pill-done':status==='PAUSED'?'pill-paused':'pill-offline');
+function updateDCS(d) {
+  const s = d.status||'OFFLINE';
+  const p = document.getElementById('dcs-pill');
+  p.textContent = s;
+  p.className = 'pill ' + (s==='RUNNING'||s==='Running'?'pill-run':s==='DONE'?'pill-done':s==='PAUSED'?'pill-wait':'pill-off');
 
-  setEl('dcs-gpu', dcs.gpu_mem || '—');
-  setEl('dcs-step', dcs.step || '—');
-  setEl('dcs-arm', dcs.arm ? 'Arm: ' + dcs.arm : '—');
-  setEl('dcs-vgap', dcs.validity_gap !== null && dcs.validity_gap !== undefined ? dcs.validity_gap.toFixed(3) : '—');
-  setEl('dcs-p8', dcs.pass8 !== null && dcs.pass8 !== undefined ? dcs.pass8.toFixed(3) : '—');
-  setEl('dcs-p1', dcs.pass1 !== null && dcs.pass1 !== undefined ? 'Pass@1: ' + dcs.pass1.toFixed(3) : 'Pass@1: —');
+  setEl('dcs-gpu', d.gpu_mem||'—');
+  setEl('dcs-step', d.step||'—');
+  setEl('dcs-arm', d.arm ? 'Arm: '+d.arm : '—');
+  setEl('dcs-vgap', d.validity_gap!=null ? d.validity_gap.toFixed(3) : '—');
+  setEl('dcs-p8', d.pass8!=null ? d.pass8.toFixed(3) : '—');
+  setEl('dcs-p1', d.pass1!=null ? 'Pass@1: '+d.pass1.toFixed(3) : 'Pass@1: —');
 
-  // Add point to history
-  if (dcs.arm && dcs.step) {
-    addDCSPoint(dcs.arm, dcs.step, dcs.validity_gap, dcs.pass8, dcs.cot_pass8);
+  if (d.arm && d.step) {
+    if (!dcsHist[d.arm]) dcsHist[d.arm]=[];
+    const last = dcsHist[d.arm].at(-1);
+    if (!last||last.x!==d.step) dcsHist[d.arm].push({x:d.step,y:+(d.validity_gap||0).toFixed(3)});
+    renderDCSVgap();
   }
 
-  // Table
-  if (dcs.results && dcs.results.length) {
+  if (d.results?.length) {
+    document.getElementById('dcs-compare-empty').style.display='none';
+    const lbls = d.results.map(r=>r.arm);
+    mkChart('dcs-compare-chart','bar',{labels:lbls,datasets:[
+      {label:'Pass@8',data:d.results.map(r=>r.pass8),backgroundColor:L.b,borderColor:P.b,borderWidth:1.5,borderRadius:4,borderSkipped:false},
+      {label:'CoT@8', data:d.results.map(r=>r.cot_pass8),backgroundColor:L.g,borderColor:P.g,borderWidth:1.5,borderRadius:4,borderSkipped:false}
+    ]},{...baseOpts(),plugins:{legend:{display:true,labels:{color:'#aaa',font:{size:10},boxWidth:10,boxHeight:10}},tooltip:{backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#111',bodyColor:'#555',padding:10,cornerRadius:8}}});
+
     const tbody = document.getElementById('dcs-table');
-    tbody.innerHTML = dcs.results.map(r => {
-      const vg = r.validity_gap;
-      const vgClass = vg < 0.05 ? 'tag-win' : vg > 0.15 ? 'tag-lose' : 'tag-neutral';
-      const hyp = vg < 0.05 ? '✓ Low false-positives' : vg > 0.2 ? '✗ High false-positives' : '~ Moderate';
-      return `<tr>
-        <td class="method">${r.arm}</td>
-        <td>${r.pass1.toFixed(3)}</td>
-        <td>${r.pass8.toFixed(3)}</td>
-        <td>${r.cot_pass8.toFixed(3)}</td>
-        <td class="${vgClass}">${vg.toFixed(3)}</td>
-        <td style="color:var(--muted);font-size:11px">${hyp}</td>
-      </tr>`;
+    const pal = [P.b,P.g,P.p,P.y];
+    tbody.innerHTML = d.results.map((r,i)=>{
+      const vg=r.validity_gap; const cl=vg<.05?'pos':vg>.15?'neg':'neu';
+      const sig=vg<.05?'✓ Low FP rate':vg>.2?'✗ High FP rate':'~ Moderate';
+      return `<tr><td class="mono" style="color:${pal[i%4]}">${r.arm}</td><td>${r.pass1.toFixed(3)}</td><td>${r.pass8.toFixed(3)}</td><td>${r.cot_pass8.toFixed(3)}</td><td class="${cl}">${vg.toFixed(3)}</td><td style="color:var(--muted);font-size:11px">${sig}</td></tr>`;
     }).join('');
-    updateDCSCompare(dcs.results);
-  }
-
-  if (dcs.log && dcs.log.length) {
-    // store for potential display
   }
 }
 
-function escHtml(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function renderDCSVgap() {
+  const arms = Object.keys(dcsHist);
+  if (!arms.length) return;
+  document.getElementById('dcs-vgap-empty').style.display='none';
+  const pal = [P.b,P.g,P.p,P.y];
+  const datasets = arms.map((arm,i)=>({
+    label:arm, data:dcsHist[arm],
+    borderColor:pal[i%4], backgroundColor:'transparent',
+    tension:0.4, pointRadius:3, pointBackgroundColor:pal[i%4], borderWidth:2
+  }));
+  mkChart('dcs-vgap-chart','line',{datasets},{
+    ...baseOpts(),
+    plugins:{legend:{display:true,labels:{color:'#aaa',font:{size:10},boxWidth:10,boxHeight:10}},tooltip:{backgroundColor:'#fff',borderColor:'rgba(0,0,0,0.1)',borderWidth:1,titleColor:'#111',bodyColor:'#555',padding:10,cornerRadius:8}},
+    scales:{
+      x:{type:'linear',title:{display:true,text:'Step',color:'#ccc',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb'}},
+      y:{title:{display:true,text:'Validity Gap',color:'#ccc',font:{size:10}},grid:{color:'rgba(0,0,0,0.04)'},ticks:{color:'#bbb'}}
+    }
+  });
 }
+
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 // ── Poll ────────────────────────────────────────────────────────
 async function poll() {
   try {
-    const r = await fetch('/api/status', { cache:'no-store' });
+    const r = await fetch('/api/status',{cache:'no-store'});
     const d = await r.json();
-    if (d.flash_evict) updateFlashUI(d.flash_evict);
-    if (d.dcs) updateDCSUI(d.dcs);
-    const t = new Date(d.timestamp);
-    document.getElementById('nav-time').textContent = t.toLocaleTimeString();
+    if (d.flash_evict) updateFE(d.flash_evict);
+    if (d.dcs) updateDCS(d.dcs);
+    document.getElementById('nav-time').textContent = new Date(d.timestamp).toLocaleTimeString();
   } catch(e) {
-    document.getElementById('nav-time').textContent = 'Error';
+    document.getElementById('nav-time').textContent = 'offline';
   }
 }
 
