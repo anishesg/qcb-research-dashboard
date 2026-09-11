@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QCB Research Dashboard</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0a0a0f; color: #e0e0e0; font-family: 'SF Mono', 'Fira Code', monospace; font-size: 13px; }
+  header { padding: 16px 24px; border-bottom: 1px solid #1e1e2e; display: flex; align-items: center; gap: 12px; }
+  header h1 { font-size: 15px; font-weight: 600; color: #a6e3a1; letter-spacing: 0.05em; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #a6e3a1; animation: pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+  .updated { margin-left: auto; color: #585b70; font-size: 11px; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: #1e1e2e; min-height: calc(100vh - 53px); }
+  .panel { background: #0a0a0f; padding: 20px; }
+  .panel-header { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
+  .panel-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #89b4fa; }
+  .badge { font-size: 10px; padding: 2px 6px; border-radius: 3px; }
+  .badge-run { background: #1e3a1e; color: #a6e3a1; }
+  .badge-done { background: #1e1e3a; color: #89b4fa; }
+  .badge-err { background: #3a1e1e; color: #f38ba8; }
+  .stat-row { display: flex; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
+  .stat { background: #111120; border: 1px solid #1e1e2e; border-radius: 6px; padding: 10px 14px; min-width: 90px; }
+  .stat-label { font-size: 10px; color: #585b70; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+  .stat-value { font-size: 18px; font-weight: 700; color: #cdd6f4; }
+  .stat-sub { font-size: 10px; color: #45475a; margin-top: 2px; }
+  .progress-bar { background: #1e1e2e; border-radius: 4px; height: 6px; margin: 8px 0; overflow: hidden; }
+  .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #89b4fa, #a6e3a1); transition: width 0.8s ease; }
+  table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 12px; }
+  th { text-align: left; padding: 6px 8px; color: #585b70; text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid #1e1e2e; font-size: 10px; }
+  td { padding: 5px 8px; border-bottom: 1px solid #111120; }
+  tr:hover td { background: #111120; }
+  .method-name { color: #89dceb; }
+  .score-good { color: #a6e3a1; }
+  .score-mid { color: #f9e2af; }
+  .score-base { color: #cdd6f4; }
+  .win { color: #a6e3a1; font-weight: 700; }
+  .lose { color: #f38ba8; }
+  .section-title { font-size: 10px; color: #585b70; text-transform: uppercase; letter-spacing: 0.08em; margin: 14px 0 6px; }
+  .log-box { background: #080810; border: 1px solid #1e1e2e; border-radius: 4px; padding: 10px; font-size: 10px; color: #585b70; max-height: 120px; overflow-y: auto; line-height: 1.6; }
+  .log-box span { color: #a6e3a1; }
+  .loading { color: #45475a; font-style: italic; }
+  @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="dot"></div>
+  <h1>QCB Research Dashboard</h1>
+  <span class="updated" id="updated">Connecting...</span>
+</header>
+<div class="grid">
+
+  <!-- FLASH-EVICT PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">Flash-Evict · Fused Prefill KV Eviction</span>
+      <span class="badge badge-run" id="fe-status">RUNNING</span>
+    </div>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-label">GPU</div>
+        <div class="stat-value" id="fe-gpu">—</div>
+        <div class="stat-sub" id="fe-util">Blackwell 96GB</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Tasks</div>
+        <div class="stat-value" id="fe-tasks">—/21</div>
+        <div class="stat-sub">LongBench</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Examples</div>
+        <div class="stat-value" id="fe-examples">—</div>
+        <div class="stat-sub" id="fe-model">Qwen2.5-7B</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">ETA</div>
+        <div class="stat-value" id="fe-eta">—</div>
+        <div class="stat-sub">remaining</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="fe-progress" style="width:0%"></div></div>
+
+    <div class="section-title">Key Results (vs SnapKV baseline)</div>
+    <table>
+      <thead><tr><th>Method</th><th>Budget</th><th>Score</th><th>vs Snap</th><th>Mem (131K)</th></tr></thead>
+      <tbody id="fe-table"><tr><td colspan="5" class="loading">Waiting for results...</td></tr></tbody>
+    </table>
+
+    <div class="section-title">Live Log</div>
+    <div class="log-box" id="fe-log">Initializing...</div>
+  </div>
+
+  <!-- DCS PANEL -->
+  <div class="panel">
+    <div class="panel-header">
+      <span class="panel-title">DCS · Diverse Correct Solutions RL</span>
+      <span class="badge badge-run" id="dcs-status">RUNNING</span>
+    </div>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-label">GPU</div>
+        <div class="stat-value" id="dcs-gpu">—</div>
+        <div class="stat-sub" id="dcs-util">Oregon A10G</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Step</div>
+        <div class="stat-value" id="dcs-step">—</div>
+        <div class="stat-sub" id="dcs-arm">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Validity Gap</div>
+        <div class="stat-value" id="dcs-vgap">—</div>
+        <div class="stat-sub">pass@8 - cot@8</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Pass@8</div>
+        <div class="stat-value" id="dcs-p8">—</div>
+        <div class="stat-sub" id="dcs-p1">p@1: —</div>
+      </div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="dcs-progress" style="width:0%"></div></div>
+
+    <div class="section-title">Arm Comparison (step 200 final)</div>
+    <table>
+      <thead><tr><th>Method</th><th>Pass@1</th><th>Pass@8</th><th>CoT@8</th><th>vGap</th></tr></thead>
+      <tbody id="dcs-table"><tr><td colspan="5" class="loading">Waiting for results...</td></tr></tbody>
+    </table>
+
+    <div class="section-title">Hypothesis</div>
+    <div class="log-box" id="dcs-log">DCS bounded rarity reward r_k = k(1-π)^(k-1) should keep validity_gap flat while MARA/UCPO widen it...</div>
+  </div>
+
+</div>
+
+<script>
+const API = '/api/status';
+let lastData = {};
+
+async function fetchStatus() {
+  try {
+    const r = await fetch(API);
+    const d = await r.json();
+    lastData = d;
+    updateUI(d);
+    document.getElementById('updated').textContent = 'Updated ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    document.getElementById('updated').textContent = 'Error: ' + e.message;
+  }
+}
+
+function colorScore(s, baseline) {
+  const diff = s - baseline;
+  if (diff > 1) return `<span class="win">+${diff.toFixed(1)}</span>`;
+  if (diff < -1) return `<span class="lose">${diff.toFixed(1)}</span>`;
+  return `<span style="color:#585b70">${diff > 0 ? '+' : ''}${diff.toFixed(1)}</span>`;
+}
+
+function updateUI(d) {
+  // Flash-evict
+  const fe = d.flash_evict || {};
+  if (fe.gpu_mem) document.getElementById('fe-gpu').textContent = fe.gpu_mem;
+  if (fe.gpu_util) document.getElementById('fe-util').textContent = fe.gpu_util + '% util';
+  if (fe.tasks_done !== undefined) document.getElementById('fe-tasks').textContent = fe.tasks_done + '/21';
+  if (fe.examples_done !== undefined) document.getElementById('fe-examples').textContent = fe.examples_done.toLocaleString();
+  if (fe.model) document.getElementById('fe-model').textContent = fe.model;
+  if (fe.eta) document.getElementById('fe-eta').textContent = fe.eta;
+  if (fe.progress !== undefined) document.getElementById('fe-progress').style.width = fe.progress + '%';
+  if (fe.status) {
+    const el = document.getElementById('fe-status');
+    el.textContent = fe.status;
+    el.className = 'badge ' + (fe.status === 'DONE' ? 'badge-done' : fe.status === 'ERROR' ? 'badge-err' : 'badge-run');
+  }
+  if (fe.results && fe.results.length) {
+    const snap256 = fe.results.find(r => r.method === 'snap_256');
+    const snapScore = snap256 ? snap256.score : null;
+    const tbody = document.getElementById('fe-table');
+    tbody.innerHTML = fe.results.map(r => {
+      const diff = snapScore !== null ? colorScore(r.score, snapScore) : '—';
+      const sc = r.score > 85 ? 'score-good' : r.score > 78 ? 'score-mid' : 'score-base';
+      return `<tr><td class="method-name">${r.method}</td><td>${r.budget}</td><td class="${sc}">${r.score.toFixed(1)}</td><td>${diff}</td><td>${r.mem || '—'}</td></tr>`;
+    }).join('');
+  }
+  if (fe.log) {
+    const lb = document.getElementById('fe-log');
+    lb.innerHTML = fe.log.slice(-8).map(l => `<div>${l}</div>`).join('');
+    lb.scrollTop = lb.scrollHeight;
+  }
+
+  // DCS
+  const dcs = d.dcs || {};
+  if (dcs.gpu_mem) document.getElementById('dcs-gpu').textContent = dcs.gpu_mem;
+  if (dcs.gpu_util) document.getElementById('dcs-util').textContent = dcs.gpu_util + '% util';
+  if (dcs.step !== undefined) document.getElementById('dcs-step').textContent = dcs.step;
+  if (dcs.arm) document.getElementById('dcs-arm').textContent = dcs.arm;
+  if (dcs.validity_gap !== undefined) document.getElementById('dcs-vgap').textContent = dcs.validity_gap.toFixed(3);
+  if (dcs.pass8 !== undefined) document.getElementById('dcs-p8').textContent = dcs.pass8.toFixed(3);
+  if (dcs.pass1 !== undefined) document.getElementById('dcs-p1').textContent = 'p@1: ' + dcs.pass1.toFixed(3);
+  if (dcs.progress !== undefined) document.getElementById('dcs-progress').style.width = dcs.progress + '%';
+  if (dcs.status) {
+    const el = document.getElementById('dcs-status');
+    el.textContent = dcs.status;
+    el.className = 'badge ' + (dcs.status === 'DONE' ? 'badge-done' : dcs.status === 'ERROR' ? 'badge-err' : 'badge-run');
+  }
+  if (dcs.results && dcs.results.length) {
+    const tbody = document.getElementById('dcs-table');
+    tbody.innerHTML = dcs.results.map(r => {
+      const vgap = r.validity_gap;
+      const vclass = vgap < 0.05 ? 'win' : vgap > 0.2 ? 'lose' : '';
+      return `<tr><td class="method-name">${r.arm}</td><td>${r.pass1.toFixed(3)}</td><td>${r.pass8.toFixed(3)}</td><td>${r.cot_pass8.toFixed(3)}</td><td class="${vclass}">${vgap.toFixed(3)}</td></tr>`;
+    }).join('');
+  }
+  if (dcs.log) {
+    const lb = document.getElementById('dcs-log');
+    lb.innerHTML = dcs.log.slice(-8).map(l => `<div>${l}</div>`).join('');
+    lb.scrollTop = lb.scrollHeight;
+  }
+}
+
+fetchStatus();
+setInterval(fetchStatus, 30000);
+</script>
+</body>
+</html>
