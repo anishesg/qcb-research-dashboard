@@ -1,11 +1,15 @@
 {
   "version": 2,
-  "builds": [{"src": "api/status.js", "use": "@vercel/node"}],
+  "builds": [
+    {"src": "api/status.js", "use": "@vercel/node"},
+    {"src": "public/**", "use": "@vercel/static"}
+  ],
   "routes": [
     {"src": "/api/status", "dest": "/api/status.js"},
-    {"src": "/(.*)", "dest": "/index.html"}
+    {"src": "/(.*)", "dest": "/public/$1"}
   ],
   "env": {
-    "SSH_KEY_PATH": "/tmp/qcb-key.pem"
+    "BLACKWELL_URL": "http://44.201.140.239:7861/status",
+    "OREGON_URL": "http://54.213.35.32:7861/status"
   }
 }
